@@ -1,11 +1,8 @@
-
 {
     "name": "Touchpad Gesture Customization",
     "description": "An extension which enable touchpad gestures customization in GNOME using Wayland. For full list of supported features please visit https://github.com/HieuTNg/touchpad-gesture-customization",
     "uuid": "touchpad-gesture-customization@coooolapps.com",
     "url": "https://github.com/HieuTNg/touchpad-gesture-customization",
     "settings-schema": "org.gnome.shell.extensions.touchpad-gesture-customization",
-    "shell-version": [
-        "49"
-    ]
+    "shell-version": ["50"]
 }
