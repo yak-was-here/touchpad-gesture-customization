@@ -10,5 +10,9 @@
         "46",
         "47",
 	    "48"
-    ]
+    ],
+    "donations": {
+        "buymeacoffee": "hieutng",
+        "kofi": "hieutng"
+    }
 }
