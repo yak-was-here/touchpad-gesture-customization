@@ -14,6 +14,22 @@
         </items>
     </object>
 
+    <object class="GtkStringList" id="tap_gestures_model">
+        <items>
+            <item translatable="yes">None</item>
+            <item translatable="yes">Toggle Overview</item>
+            <item translatable="yes">Show Desktop</item>
+            <item translatable="yes">Show notification list</item>
+            <item translatable="yes">Close Window</item>
+            <item translatable="yes">Close Tab (Ctrl + W)</item>
+            <item translatable="yes">Play/Pause</item>
+            <item translatable="yes">Next Track</item>
+            <item translatable="yes">Previous Track</item>
+            <item translatable="yes">Mute</item>
+            <item translatable="yes">Screenshot</item>
+        </items>
+    </object>
+
      <object class="GtkStringList" id="vertical_swipe_gestures_model">
         <items>
             <item translatable="yes">None</item>
@@ -109,6 +125,30 @@
                     <object class="AdwComboRow" id="pinch-4-finger-gesture">
                         <property name="title" translatable="yes">4-fingers pinch gesture</property>
                         <property name="model">pinch_gestures_model</property>
+                    </object>
+                </child>
+            </object>
+        </child>
+
+        <!-- Tap Gestures -->
+        <child>
+            <object class="AdwPreferencesGroup">
+                <property name="title">Tap Gestures</property>
+                <property name="description" translatable="yes">Rest the fingers briefly, then lift them without moving. Quick 3-finger taps are still sent to apps as a middle click.</property>
+
+                <!-- 3 finger tap gesture -->
+                <child>
+                    <object class="AdwComboRow" id="tap-3-finger-gesture">
+                        <property name="title" translatable="yes">3-fingers tap gesture</property>
+                        <property name="model">tap_gestures_model</property>
+                    </object>
+                </child>
+
+                <!-- 4 finger tap gesture -->
+                <child>
+                    <object class="AdwComboRow" id="tap-4-finger-gesture">
+                        <property name="title" translatable="yes">4-fingers tap gesture</property>
+                        <property name="model">tap_gestures_model</property>
                     </object>
                 </child>
             </object>

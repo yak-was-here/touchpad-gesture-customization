@@ -25,6 +25,12 @@ export const AltTabConstants = {
     MIN_WIN_COUNT: 8,
 };
 
+export const TapConstants = {
+    // libinput starts a 3/4 finger hold ~180ms after the fingers touch down,
+    // so a tap is a hold that is released within this duration (ms)
+    MAX_HOLD_DURATION: 300,
+};
+
 export const OverviewControlsState = {
     APP_GRID_P: -1,
     HIDDEN: 0,

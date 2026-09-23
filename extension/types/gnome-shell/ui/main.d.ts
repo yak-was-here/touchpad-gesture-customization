@@ -45,6 +45,7 @@ declare module 'resource:///org/gnome/shell/ui/main.js' {
         visible: boolean;
         show(): void;
         hide(): void;
+        toggle(): void;
         showApps(): void;
         connect(
             signal: 'showing' | 'hiding' | 'hidden' | 'shown',
@@ -65,6 +66,10 @@ declare module 'resource:///org/gnome/shell/ui/main.js' {
         ): void;
 
         _swipeTracker: SwipeTracker;
+    };
+
+    const screenshotUI: {
+        open(): Promise<void>;
     };
 
     const wm: WindowManager & {
