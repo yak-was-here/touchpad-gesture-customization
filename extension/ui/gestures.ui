@@ -113,6 +113,7 @@
         <child>
             <object class="AdwPreferencesGroup">
                 <property name="title">Pinch Gestures</property>
+                <property name="description" translatable="yes">Pull your fingers together/push your fingers apart.</property>
 
                 <!-- 3 finger pinch gesture -->
                 <child>
