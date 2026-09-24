@@ -57,7 +57,7 @@
     <object class="AdwPreferencesPage" id="gestures_page">
         <property name="title">System Gestures</property>
         <property name="icon-name">gesture-swipe-right-symbolic</property>
-        <property name="description" translatable="yes">The Media Control option toggles play/pause when your fingers rest still on the touchpad for a moment.</property>
+        <property name="description" translatable="yes">The Media Control option toggles play/pause when your fingers rest still on the touchpad for a moment, unless a tap gesture is set for that same number of fingers.</property>
 
         <!-- 3-fingers Swipe Gestures -->
         <child>
