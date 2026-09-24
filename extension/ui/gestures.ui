@@ -18,13 +18,13 @@
         <items>
             <item translatable="yes">None</item>
             <item translatable="yes">Toggle Overview</item>
-            <item translatable="yes">Show Desktop</item>
+            <item translatable="yes">Toggle Desktop</item>
             <item translatable="yes">Show notification list</item>
             <item translatable="yes">Close Window</item>
             <item translatable="yes">Play/Pause</item>
             <item translatable="yes">Next Track</item>
             <item translatable="yes">Previous Track</item>
-            <item translatable="yes">Mute</item>
+            <item translatable="yes">Mute/Unmute</item>
             <item translatable="yes">Screenshot</item>
         </items>
     </object>
