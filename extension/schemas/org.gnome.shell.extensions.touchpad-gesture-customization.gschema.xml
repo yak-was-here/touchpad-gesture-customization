@@ -14,12 +14,11 @@
     <value value='2' nick='SHOW_DESKTOP' />
     <value value='3' nick='SHOW_NOTIFICATION_LIST' />
     <value value='4' nick='CLOSE_WINDOW' />
-    <value value='5' nick='CLOSE_TAB' />
-    <value value='6' nick='PLAY_PAUSE' />
-    <value value='7' nick='NEXT_TRACK' />
-    <value value='8' nick='PREVIOUS_TRACK' />
-    <value value='9' nick='MUTE' />
-    <value value='10' nick='SCREENSHOT' />
+    <value value='5' nick='PLAY_PAUSE' />
+    <value value='6' nick='NEXT_TRACK' />
+    <value value='7' nick='PREVIOUS_TRACK' />
+    <value value='8' nick='MUTE' />
+    <value value='9' nick='SCREENSHOT' />
   </enum>
   <enum id='org.gnome.shell.extensions.touchpad-gesture-customization.overview-navigation-states'>
     <value value='0' nick='CYCLIC' />

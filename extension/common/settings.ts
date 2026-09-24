@@ -37,12 +37,11 @@ export enum TapGestureType {
     SHOW_DESKTOP = 2,
     SHOW_NOTIFICATION_LIST = 3,
     CLOSE_WINDOW = 4,
-    CLOSE_TAB = 5,
-    PLAY_PAUSE = 6,
-    NEXT_TRACK = 7,
-    PREVIOUS_TRACK = 8,
-    MUTE = 9,
-    SCREENSHOT = 10,
+    PLAY_PAUSE = 5,
+    NEXT_TRACK = 6,
+    PREVIOUS_TRACK = 7,
+    MUTE = 8,
+    SCREENSHOT = 9,
 }
 
 export enum OverviewNavigationState {

@@ -113,12 +113,6 @@ export class TapGestureExtension implements ISubExtension {
             case TapGestureType.CLOSE_WINDOW:
                 this._closeFocusedWindow();
                 break;
-            case TapGestureType.CLOSE_TAB:
-                getVirtualKeyboard().sendKeys([
-                    Clutter.KEY_Control_L,
-                    Clutter.KEY_w,
-                ]);
-                break;
             case TapGestureType.PLAY_PAUSE:
                 getVirtualKeyboard().sendKeys([Clutter.KEY_AudioPlay]);
                 break;
