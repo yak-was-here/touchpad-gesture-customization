@@ -382,7 +382,9 @@ export default class TouchpadGestureCustomization extends Extension {
             horizontalMediaControlFingers?.length
         ) {
             const mediaControlGestureExtension =
-                new MediaControlGestureExtension();
+                new MediaControlGestureExtension([
+                    ...tapFingersToGestureMap.keys(),
+                ]);
 
             if (verticalMediaControlFingers?.length) {
                 mediaControlGestureExtension.setVerticalSwipeTracker(
