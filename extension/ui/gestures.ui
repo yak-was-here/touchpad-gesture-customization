@@ -133,7 +133,7 @@
         <child>
             <object class="AdwPreferencesGroup">
                 <property name="title">Tap Gestures</property>
-                <property name="description" translatable="yes">Rest the fingers briefly, then lift them without moving. Quick 3-finger taps are still sent to apps as a middle click.</property>
+                <property name="description" translatable="yes">Rest your fingers and lift 180–480 ms after touching down. Quicker taps (lifting before 180 ms) can't trigger an action because they register as a middle click for 3-fingers and cannot be overridden. Getting the timing right can take a little practice.</property>
 
                 <!-- 3 finger tap gesture -->
                 <child>
