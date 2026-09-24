@@ -2,6 +2,7 @@ import Clutter from 'gi://Clutter';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import {showScreenshotUI} from 'resource:///org/gnome/shell/ui/screenshot.js';
 import {CustomEventType} from 'resource:///org/gnome/shell/ui/swipeTracker.js';
 import {TapGestureType} from '../common/settings.js';
 import {TapConstants} from '../constants.js';
@@ -216,7 +217,7 @@ export class TapGestureExtension implements ISubExtension {
                 break;
             case TapGestureType.SCREENSHOT:
                 if (Main.overview.visible) Main.overview.hide();
-                Main.screenshotUI.open();
+                showScreenshotUI();
                 break;
         }
     }

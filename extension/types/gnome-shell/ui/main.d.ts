@@ -68,10 +68,6 @@ declare module 'resource:///org/gnome/shell/ui/main.js' {
         _swipeTracker: SwipeTracker;
     };
 
-    const screenshotUI: {
-        open(): Promise<void>;
-    };
-
     const wm: WindowManager & {
         skipNextEffect(actor: Meta.WindowActor): void;
         _workspaceAnimation: WorkspaceAnimationController;
