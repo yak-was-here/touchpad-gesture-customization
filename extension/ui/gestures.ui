@@ -63,7 +63,7 @@
         <child>
             <object class="AdwPreferencesGroup">
                 <property name="title">3-Fingers Swipe Gestures</property>
-                <property name="description" translatable="yes">Swipe to trigger the action.</property>
+                <property name="description" translatable="yes">Swipe to trigger the action. Do not hold before swiping.</property>
 
                 <!-- Vertical -->
                 <child>
@@ -88,7 +88,7 @@
         <child>
             <object class="AdwPreferencesGroup">
                 <property name="title">4-Fingers Swipe Gestures</property>
-                <property name="description" translatable="yes">Swipe to trigger the action.</property>
+                <property name="description" translatable="yes">Swipe to trigger the action. Do not hold before swiping.</property>
 
                 <!-- Vertical -->
                 <child>
