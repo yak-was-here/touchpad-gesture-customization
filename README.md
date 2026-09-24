@@ -104,12 +104,14 @@ gnome-extensions enable touchpad-gesture-customization@coooolapps.com
 - In addition to swiping, resting 3/4 fingers on the touchpad (a *hold* gesture) toggles play/pause. The action fires as soon as the hold is registered, so you get immediate feedback that the gesture was recognised. Note that libinput only reports a hold once the fingers have been still for a short moment, so a quick tap does not trigger it.
 - Media Control sends the standard media keys (`XF86AudioNext` / `XF86AudioPrev` / `XF86AudioPlay`), so it applies to whichever player GNOME currently considers active, exactly as pressing the media keys on a keyboard would. It is not tied to any specific application.
 - How far you need to swipe before a track changes scales with the **Touchpad swipe speed** setting: raising it makes media swipes trigger with a shorter movement.
+- Resting your fingers doesn't toggle play/pause for a finger count that has a tap action, because every tap starts with a rest.
 
 #### Tap Gesture Notes
 
-- Rest your fingers and lift 180–480 ms after touching down. Quicker taps (lifting before 180 ms) can't trigger an action because they register as a middle click for 3-fingers and cannot be overridden. Getting the timing right can take a little practice.
+- Rest your fingers and lift 180–480 ms after touching down. Getting the timing right can take a little practice. Quicker taps (lifting before 180 ms) can't trigger an action because they register as a middle click for 3-fingers and cannot be overridden.
 - Moving your fingers turns the tap into a swipe, so no tap action fires.
 - Media actions send the standard media keys, the same way Media Control does.
+- Setting a tap action turns off Media Control's play/pause on finger rest for the same number of fingers.
 
 #### Notes
 
