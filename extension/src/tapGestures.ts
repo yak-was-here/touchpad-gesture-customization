@@ -10,6 +10,90 @@ import {getVirtualKeyboard} from './utils/keyboard.js';
 const ALLOWED_MODES = Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW;
 
 /**
+ * Minimizes and restores the windows on the active workspace. Follows the
+ * rules of the pinch Show Desktop (pinchGestures/showDesktop.ts): only
+ * minimizable windows are hidden, switching workspace, opening a window or
+ * disabling the extension restores them, and restoring a window by hand
+ * ends the toggle.
+ */
+class ShowDesktopToggle {
+    private _hiddenWindows: Meta.Window[] = [];
+    private _workspace?: Meta.Workspace;
+    private _workspaceChangedId = 0;
+    private _windowAddedId = 0;
+    private _windowUnMinimizedId = 0;
+
+    constructor() {
+        this._workspaceChangedId = global.workspace_manager.connect(
+            'active-workspace-changed',
+            this._workspaceChanged.bind(this)
+        );
+        this._windowUnMinimizedId = global.window_manager.connect(
+            'unminimize',
+            this._windowUnMinimized.bind(this)
+        );
+        this._workspaceChanged();
+    }
+
+    destroy() {
+        this._restore();
+
+        if (this._windowAddedId)
+            this._workspace?.disconnect(this._windowAddedId);
+
+        global.workspace_manager.disconnect(this._workspaceChangedId);
+        global.window_manager.disconnect(this._windowUnMinimizedId);
+    }
+
+    toggle() {
+        if (this._hiddenWindows.length) {
+            this._restore();
+            return;
+        }
+
+        this._hiddenWindows = (this._workspace?.list_windows() ?? []).filter(
+            window =>
+                window.get_window_type() === Meta.WindowType.NORMAL &&
+                !window.is_skip_taskbar() &&
+                !window.minimized &&
+                window.can_minimize()
+        );
+        this._hiddenWindows.forEach(window => window.minimize());
+    }
+
+    private _restore() {
+        const windows = this._workspace?.list_windows() ?? [];
+        const hiddenWindows = this._hiddenWindows;
+
+        this._hiddenWindows = [];
+        hiddenWindows
+            .filter(window => windows.includes(window))
+            .forEach(window => window.unminimize());
+    }
+
+    private _workspaceChanged() {
+        if (this._windowAddedId)
+            this._workspace?.disconnect(this._windowAddedId);
+
+        this._restore();
+        this._workspace = global.workspace_manager.get_active_workspace();
+        this._windowAddedId = this._workspace.connect(
+            'window-added',
+            this._windowAdded.bind(this)
+        );
+    }
+
+    private _windowAdded(_workspace: unknown, window: Meta.Window) {
+        if (!window.is_skip_taskbar()) this._restore();
+    }
+
+    private _windowUnMinimized(_wm: Shell.WM, actor: Meta.WindowActor) {
+        if (actor.meta_window?.get_workspace() === this._workspace)
+            this._hiddenWindows = [];
+    }
+}
+
+/**
  * Detects 3 and 4 finger taps from touchpad hold gestures.
  *
  * libinput emits HOLD BEGIN once n fingers rest on the touchpad without
@@ -31,10 +115,13 @@ export class TapGestureExtension implements ISubExtension {
     private _stageCaptureEvent = 0;
     private _holdFingers = 0;
     private _holdBeginTime = 0;
-    private _hiddenWindows: Meta.Window[] = [];
+    private _showDesktop?: ShowDesktopToggle;
 
     constructor(actions: Map<number, TapGestureType>) {
         this._actions = actions;
+        if ([...actions.values()].includes(TapGestureType.SHOW_DESKTOP))
+            this._showDesktop = new ShowDesktopToggle();
+
         this._stageCaptureEvent = global.stage.connect(
             'captured-event::touchpad',
             this._handleEvent.bind(this)
@@ -47,7 +134,8 @@ export class TapGestureExtension implements ISubExtension {
             this._stageCaptureEvent = 0;
         }
 
-        this._hiddenWindows = [];
+        this._showDesktop?.destroy();
+        this._showDesktop = undefined;
     }
 
     private _handleEvent(
@@ -105,7 +193,8 @@ export class TapGestureExtension implements ISubExtension {
                 Main.overview.toggle();
                 break;
             case TapGestureType.SHOW_DESKTOP:
-                this._toggleShowDesktop();
+                if (Main.overview.visible) Main.overview.hide();
+                this._showDesktop?.toggle();
                 break;
             case TapGestureType.SHOW_NOTIFICATION_LIST:
                 Main.panel.toggleCalendar();
@@ -135,30 +224,5 @@ export class TapGestureExtension implements ISubExtension {
     private _closeFocusedWindow() {
         const window = global.display.get_focus_window();
         if (window?.can_close()) window.delete(global.get_current_time());
-    }
-
-    private _toggleShowDesktop() {
-        if (Main.overview.visible) Main.overview.hide();
-
-        const windows = global.workspace_manager
-            .get_active_workspace()
-            .list_windows()
-            .filter(
-                window =>
-                    window.get_window_type() === Meta.WindowType.NORMAL &&
-                    !window.is_skip_taskbar()
-            );
-        const visibleWindows = windows.filter(window => !window.minimized);
-
-        if (visibleWindows.length) {
-            this._hiddenWindows = visibleWindows;
-            visibleWindows.forEach(window => window.minimize());
-            return;
-        }
-
-        this._hiddenWindows
-            .filter(window => windows.includes(window))
-            .forEach(window => window.unminimize());
-        this._hiddenWindows = [];
     }
 }
