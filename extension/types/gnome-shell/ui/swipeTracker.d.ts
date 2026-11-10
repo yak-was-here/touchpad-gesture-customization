@@ -27,6 +27,11 @@ declare module 'resource:///org/gnome/shell/ui/swipeTracker.js' {
         allowLongSwipes: boolean;
         _touchpadGesture?: TouchpadGesture;
         _oldTouchpadGesture?: TouchpadGesture; // custom
+        // Present since the Clutter.PanGesture port (GNOME 49). The touchpad
+        // handler is attached to this action's actor from 49.3 onward.
+        _panGesture?: {
+            actor?: Clutter.Actor;
+        };
         _allowedModes: Shell.ActionMode;
         _progress: number;
 

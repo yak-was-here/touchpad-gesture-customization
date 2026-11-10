@@ -153,9 +153,12 @@ export default class TouchpadGestureCustomization extends Extension {
             'workspace-switching-states'
         );
 
-        // Disable default workspace navigation using horizontal swipe
+        // Take over the native horizontal workspace swipe even when no finger
+        // count is assigned to it, so "None" does not leave that gesture active.
+        // A single modifier is applied; replacing an un-applied one used to
+        // leak its touchpad handler for the rest of the session.
         gestureExtension.setHorizontalWorkspaceAnimationModifier(
-            [],
+            horizontalWorkspaceNavigationFingers ?? [],
             workspaceSwitchingState
         );
 
@@ -163,13 +166,6 @@ export default class TouchpadGestureCustomization extends Extension {
         if (verticalWorkspaceNavigationFingers?.length)
             gestureExtension.setVerticalWorkspaceAnimationModifier(
                 verticalWorkspaceNavigationFingers,
-                workspaceSwitchingState
-            );
-
-        // Enable horizontal swipe for workspace navigation
-        if (horizontalWorkspaceNavigationFingers?.length)
-            gestureExtension.setHorizontalWorkspaceAnimationModifier(
-                horizontalWorkspaceNavigationFingers,
                 workspaceSwitchingState
             );
 
