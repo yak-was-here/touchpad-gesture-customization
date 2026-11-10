@@ -9,6 +9,7 @@ export enum PinchGestureType {
     SHOW_NOTIFICATION_LIST = 4,
     VOLUME_CONTROL = 5,
     KEYBOARD_BACKLIGHT_CONTROL = 6,
+    MINIMIZE_WINDOW = 7,
 }
 
 export enum VerticalSwipeGestureType {
