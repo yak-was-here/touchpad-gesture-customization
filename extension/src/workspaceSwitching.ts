@@ -1,6 +1,7 @@
 import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
 import Shell from 'gi://Shell';
+import * as Config from 'resource:///org/gnome/shell/misc/config.js';
 import {WorkspaceAnimationController} from 'resource:///org/gnome/shell/ui/workspaceAnimation.js';
 import {
     SwipeTracker,
@@ -33,18 +34,86 @@ declare interface ShellSwipeTracker {
     checkAllowedGesture?: (event: CustomEventType) => boolean;
 }
 
-function connectTouchpadEventToTracker(touchpadGesture: TouchpadGesture) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (global.stage as any).connectObject(
-        'captured-event::touchpad',
-        touchpadGesture._handleEvent.bind(touchpadGesture),
-        touchpadGesture
+// gnome-shell 49.3 (006cef5a68, "swipeTracker: Handle touchpad gestures on
+// actor") moved TouchpadSwipeGesture from
+// `global.stage.connectObject('captured-event::touchpad', ...)` to
+// `actor.connectObject('event::touchpad', ...)`. 49.0–49.2 still use the
+// stage capture signal. 50 and 51 keep the 49.3 connection. The workspace
+// tracker actor is the stage; overview and app-grid trackers use other actors.
+function shellVersionAtLeast(major: number, minor: number): boolean {
+    const [shellMajor, shellMinor] = Config.PACKAGE_VERSION.split('.').map(
+        part => Number.parseInt(part, 10)
     );
+
+    if (shellMajor !== major) return shellMajor > major;
+
+    return (Number.isNaN(shellMinor) ? 0 : shellMinor) >= minor;
 }
 
-function disconnectTouchpadEventFromTracker(touchpadGesture: TouchpadGesture) {
+const NATIVE_TOUCHPAD_FOLLOWS_ACTOR = shellVersionAtLeast(49, 3);
+
+interface SignalEmitter {
+    connectObject(
+        signal: string,
+        handler: (...args: never[]) => boolean,
+        tracked: object
+    ): void;
+    disconnectObject(tracked: object): void;
+}
+
+interface SuspendedNativeTouchpad {
+    emitter: Clutter.Actor;
+    signal: string;
+}
+
+const suspendedNativeTouchpads = new WeakMap<object, SuspendedNativeTouchpad>();
+
+function signalEmitter(actor: Clutter.Actor): SignalEmitter {
+    // connectObject is installed on GObject.Object by gnome-shell, not in the
+    // Clutter typings.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (global.stage as any).disconnectObject(touchpadGesture);
+    return actor as any;
+}
+
+function nativeTouchpadSignal(): string {
+    return NATIVE_TOUCHPAD_FOLLOWS_ACTOR
+        ? 'event::touchpad'
+        : 'captured-event::touchpad';
+}
+
+function nativeTouchpadEmitter(swipeTracker: SwipeTracker): Clutter.Actor {
+    if (!NATIVE_TOUCHPAD_FOLLOWS_ACTOR) return global.stage;
+
+    return swipeTracker._panGesture?.actor ?? global.stage;
+}
+
+// Drop the shell's touchpad handler. Safe to call twice on the same gesture:
+// the horizontal and vertical modifiers share one workspace tracker.
+function suspendNativeTouchpad(swipeTracker: SwipeTracker): void {
+    const gesture = swipeTracker._touchpadGesture;
+    if (!gesture || suspendedNativeTouchpads.has(gesture)) return;
+
+    const emitter = nativeTouchpadEmitter(swipeTracker);
+    signalEmitter(emitter).disconnectObject(gesture);
+    suspendedNativeTouchpads.set(gesture, {
+        emitter,
+        signal: nativeTouchpadSignal(),
+    });
+}
+
+// Put back the handler on the same actor and signal gnome-shell connected.
+function resumeNativeTouchpad(gesture: TouchpadGesture | undefined): void {
+    if (!gesture) return;
+
+    const suspended = suspendedNativeTouchpads.get(gesture);
+    if (!suspended) return;
+
+    suspendedNativeTouchpads.delete(gesture);
+    signalEmitter(suspended.emitter).connectObject(
+        suspended.signal,
+        gesture._handleEvent.bind(gesture),
+        gesture
+    );
 }
 
 class WorkspaceAnimationModifier {
@@ -75,10 +144,7 @@ class WorkspaceAnimationModifier {
     }
 
     apply(): void {
-        if (this._workspaceAnimation._swipeTracker._touchpadGesture)
-            disconnectTouchpadEventFromTracker(
-                this._workspaceAnimation._swipeTracker._touchpadGesture
-            );
+        suspendNativeTouchpad(this._workspaceAnimation._swipeTracker);
 
         this._swipeTracker.connect('begin', this._gestureBegin.bind(this));
         this._swipeTracker.connect('update', this._gestureUpdate.bind(this));
@@ -173,9 +239,9 @@ class WorkspaceAnimationModifier {
     }
 
     destroy(): void {
-        const swipeTracker = this._workspaceAnimation._swipeTracker;
-        if (swipeTracker._touchpadGesture)
-            connectTouchpadEventToTracker(swipeTracker._touchpadGesture);
+        resumeNativeTouchpad(
+            this._workspaceAnimation._swipeTracker._touchpadGesture
+        );
 
         if (this._swipeTracker) {
             this._swipeTracker.destroy();
@@ -309,8 +375,8 @@ export class WorkspaceSwitchingExtension implements ISubExtension {
             swipeTracker._touchpadGesture?.destroy();
             swipeTracker._touchpadGesture = swipeTracker._oldTouchpadGesture;
             swipeTracker._oldTouchpadGesture = undefined;
-            if (swipeTracker._touchpadGesture && disableOldGesture)
-                connectTouchpadEventToTracker(swipeTracker._touchpadGesture);
+            if (disableOldGesture)
+                resumeNativeTouchpad(swipeTracker._touchpadGesture);
         });
 
         this._verticalWorkspaceAnimationModifier?.destroy();
@@ -325,7 +391,7 @@ export class WorkspaceSwitchingExtension implements ISubExtension {
         disablePrevious: boolean
     ): void {
         if (swipeTracker._touchpadGesture && disablePrevious) {
-            disconnectTouchpadEventFromTracker(swipeTracker._touchpadGesture);
+            suspendNativeTouchpad(swipeTracker);
             swipeTracker._oldTouchpadGesture = swipeTracker._touchpadGesture;
         }
 
