@@ -20,6 +20,7 @@ export enum VerticalSwipeGestureType {
     BRIGHTNESS_CONTROL = 5,
     WINDOW_MANIPULATION = 6,
     MEDIA_CONTROL = 7,
+    SHOW_DESKTOP = 8,
 }
 
 export enum HorizontalSwipeGestureType {
@@ -30,6 +31,7 @@ export enum HorizontalSwipeGestureType {
     VOLUME_CONTROL = 4,
     BRIGHTNESS_CONTROL = 5,
     MEDIA_CONTROL = 6,
+    SHOW_DESKTOP = 7,
 }
 
 export enum TapGestureType {

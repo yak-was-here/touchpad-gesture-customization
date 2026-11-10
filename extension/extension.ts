@@ -26,6 +26,10 @@ import {BrightnessControlGestureExtension} from './src/brightnessControl.js';
 import {MediaControlGestureExtension} from './src/mediaControl.js';
 import {PinchVolumeControlExtension} from './src/pinchGestures/volumeControl.js';
 import {TapGestureExtension} from './src/tapGestures.js';
+import {
+    ShowDesktopToggle,
+    createShowDesktopSwipes,
+} from './src/showDesktopToggle.js';
 import {PinchKeyboardBacklightControlExtension} from './src/pinchGestures/keyboardBacklightControl.js';
 
 export default class TouchpadGestureCustomization extends Extension {
@@ -216,7 +220,7 @@ export default class TouchpadGestureCustomization extends Extension {
 
         const pinchToFingersMap = this._getPinchGestureTypeAndFingers();
 
-        // pinch to show desktop (not working)
+        // pinch to show desktop
         const showDesktopFingers = pinchToFingersMap.get(
             PinchGestureType.SHOW_DESKTOP
         );
@@ -279,13 +283,48 @@ export default class TouchpadGestureCustomization extends Extension {
             );
 
         /**
-         * Tap Gestures
+         * Tap gestures, and Show Desktop shared by tap and swipe
          */
 
         const tapFingersToGestureMap = this._getTapFingersAndGestureType();
+        const verticalShowDesktopFingers = verticalSwipeToFingersMap.get(
+            VerticalSwipeGestureType.SHOW_DESKTOP
+        );
+        const horizontalShowDesktopFingers = horizontalSwipeToFingersMap.get(
+            HorizontalSwipeGestureType.SHOW_DESKTOP
+        );
+        const tapWantsShowDesktop = [
+            ...tapFingersToGestureMap.values(),
+        ].includes(TapGestureType.SHOW_DESKTOP);
+        let showDesktopToggle: ShowDesktopToggle | undefined;
+
+        if (
+            tapWantsShowDesktop ||
+            verticalShowDesktopFingers?.length ||
+            horizontalShowDesktopFingers?.length
+        ) {
+            showDesktopToggle = new ShowDesktopToggle();
+            this._extensions.push(showDesktopToggle);
+
+            if (
+                verticalShowDesktopFingers?.length ||
+                horizontalShowDesktopFingers?.length
+            )
+                this._extensions.push(
+                    createShowDesktopSwipes(
+                        showDesktopToggle,
+                        verticalShowDesktopFingers,
+                        horizontalShowDesktopFingers
+                    )
+                );
+        }
+
         if (tapFingersToGestureMap.size)
             this._extensions.push(
-                new TapGestureExtension(tapFingersToGestureMap)
+                new TapGestureExtension(
+                    tapFingersToGestureMap,
+                    showDesktopToggle
+                )
             );
 
         // TODO: consider having an option for 'hold and swipe gestures' that can either
