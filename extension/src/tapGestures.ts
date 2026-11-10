@@ -5,7 +5,8 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {showScreenshotUI} from 'resource:///org/gnome/shell/ui/screenshot.js';
 import {CustomEventType} from 'resource:///org/gnome/shell/ui/swipeTracker.js';
 import {TapGestureType} from '../common/settings.js';
-import {TapConstants} from '../constants.js';
+import {ExtSettings, TapConstants} from '../constants.js';
+import {registerTouchscreenSink} from './touchscreenGestures.js';
 import {getVirtualKeyboard} from './utils/keyboard.js';
 
 const ALLOWED_MODES = Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW;
@@ -117,6 +118,7 @@ export class TapGestureExtension implements ISubExtension {
     private _holdFingers = 0;
     private _holdBeginTime = 0;
     private _showDesktop?: ShowDesktopToggle;
+    private _unregisterTouchscreen?: () => void;
 
     constructor(actions: Map<number, TapGestureType>) {
         this._actions = actions;
@@ -127,9 +129,23 @@ export class TapGestureExtension implements ISubExtension {
             'captured-event::touchpad',
             this._handleEvent.bind(this)
         );
+
+        // Taps do not compete with GNOME's pan gestures (a tap does not
+        // move), so canHandle stays false. The handler still sees the
+        // synthesized hold so the same 180–480 ms window applies.
+        if (ExtSettings.MIRROR_TOUCHSCREEN)
+            this._unregisterTouchscreen = registerTouchscreenSink({
+                canHandle: () => false,
+                touchscreenState: () => 'idle',
+                handleEvent: event =>
+                    this._handleEvent(undefined, event as CustomEventType),
+            });
     }
 
     destroy(): void {
+        this._unregisterTouchscreen?.();
+        this._unregisterTouchscreen = undefined;
+
         if (this._stageCaptureEvent) {
             global.stage.disconnect(this._stageCaptureEvent);
             this._stageCaptureEvent = 0;

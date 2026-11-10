@@ -27,6 +27,7 @@ declare module 'resource:///org/gnome/shell/ui/swipeTracker.js' {
         allowLongSwipes: boolean;
         _touchpadGesture?: TouchpadGesture;
         _oldTouchpadGesture?: TouchpadGesture; // custom
+        _panGesture?: Clutter.PanGesture;
         _allowedModes: Shell.ActionMode;
         _progress: number;
 

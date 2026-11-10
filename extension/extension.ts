@@ -27,6 +27,10 @@ import {MediaControlGestureExtension} from './src/mediaControl.js';
 import {PinchVolumeControlExtension} from './src/pinchGestures/volumeControl.js';
 import {TapGestureExtension} from './src/tapGestures.js';
 import {PinchKeyboardBacklightControlExtension} from './src/pinchGestures/keyboardBacklightControl.js';
+import {
+    startTouchscreenMirroring,
+    TouchscreenMirroring,
+} from './src/touchscreenGestures.js';
 
 export default class TouchpadGestureCustomization extends Extension {
     private _extensions: ISubExtension[];
@@ -34,6 +38,7 @@ export default class TouchpadGestureCustomization extends Extension {
     private _settingChangedId = 0;
     private _reloadWaitId = 0;
     private _addReloadDelayFor: AllSettingsKeys[];
+    private _touchscreenMirroring?: TouchscreenMirroring;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(metadata: any) {
@@ -89,6 +94,11 @@ export default class TouchpadGestureCustomization extends Extension {
     _enable() {
         this._initializeSettings();
         this._extensions = [];
+
+        // Start before handlers are constructed so their registrations attach
+        // to a live recognizer. The setting reload path rebuilds both.
+        if (Constants.ExtSettings.MIRROR_TOUCHSCREEN)
+            this._touchscreenMirroring = startTouchscreenMirroring();
         if (this.settings === undefined) return;
 
         const verticalSwipeToFingersMap =
@@ -553,6 +563,8 @@ export default class TouchpadGestureCustomization extends Extension {
             Constants.ExtSettings.APP_GESTURES = this.settings.get_boolean(
                 'enable-forward-back-gesture'
             );
+            Constants.ExtSettings.MIRROR_TOUCHSCREEN =
+                this.settings.get_boolean('mirror-gestures-to-touchscreen');
 
             Constants.TouchpadConstants.SWIPE_MULTIPLIER =
                 Constants.TouchpadConstants.DEFAULT_SWIPE_MULTIPLIER *
@@ -575,6 +587,10 @@ export default class TouchpadGestureCustomization extends Extension {
     }
 
     _disable() {
+        // Stop delivering synthesized events before the handlers are destroyed.
+        this._touchscreenMirroring?.destroy();
+        this._touchscreenMirroring = undefined;
+
         VKeyboard.extensionCleanup();
         this._extensions.reverse().forEach(extension => extension.destroy());
         this._extensions = [];
