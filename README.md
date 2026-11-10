@@ -62,6 +62,7 @@ gnome-extensions enable touchpad-gesture-customization@coooolapps.com
 | Show Notification List     | Show GNOME notification                         | 3/4     |
 | Volume Control             | Increase/decrease system volume                 | 3/4     |
 | Keyboard Backlight Control | Increase/decrease keyboard backlight            | 3/4     |
+| Minimize Window            | Pinch in minimizes the focused window. Pinch out restores the last window this gesture minimized | 3/4     |
 
 | Tap Gesture Actions    | Description                                     | Fingers |
 | :--------------------- | :---------------------------------------------- | :------ |
@@ -113,6 +114,13 @@ gnome-extensions enable touchpad-gesture-customization@coooolapps.com
 - Moving your fingers turns the tap into a swipe, so no tap action fires.
 - Media actions send the standard media keys, the same way Media Control does.
 - Setting a tap action turns off Media Control's play/pause on finger rest for the same number of fingers.
+
+#### Minimize Window Notes
+
+- Pinch in minimizes the focused window, and only when that window can be minimized. The desktop, the dock, and a pinch with nothing focused do nothing.
+- Pinch out restores the window this gesture minimized most recently, and raises it. Windows minimized another way are left as they are. Pinch out does nothing when this gesture has not minimized a window, or when that window was already closed or restored.
+- The restore list is kept in memory. Disabling the extension, or changing a setting (which reloads it), clears the list.
+- If the window closes while the pinch is still finishing, the gesture leaves that window alone.
 
 #### Keyboard Backlight Notes
 - This will only work if you have a Keyboard Backlight tile in Gnome quick settings.

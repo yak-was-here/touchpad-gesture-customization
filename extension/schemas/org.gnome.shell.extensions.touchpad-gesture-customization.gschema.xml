@@ -8,6 +8,7 @@
     <value value='4' nick='SHOW_NOTIFICATION_LIST' />
     <value value='5' nick='VOLUME_CONTROL' />
     <value value='6' nick='KEYBOARD_BACKLIGHT_CONTROL' />
+    <value value='7' nick='MINIMIZE_WINDOW' />
   </enum>
   <enum id='org.gnome.shell.extensions.touchpad-gesture-customization.tap-gestures'>
     <value value='0' nick='NONE' />

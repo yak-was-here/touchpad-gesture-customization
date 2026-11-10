@@ -12,6 +12,7 @@
             <item translatable="yes">Show notification list</item>
             <item translatable="yes">Volume Control</item>
             <item translatable="yes">Keyboard Backlight Control</item>
+            <item translatable="yes">Minimize Window</item>
         </items>
     </object>
 

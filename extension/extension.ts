@@ -20,6 +20,7 @@ import * as VKeyboard from './src/utils/keyboard.js';
 import {SnapWindowExtension} from './src/snapWindow.js';
 import {ShowDesktopExtension} from './src/pinchGestures/showDesktop.js';
 import {OpenCloseWindowTabExtension} from './src/pinchGestures/openCloseWindowTab.js';
+import {MinimizeWindowExtension} from './src/pinchGestures/minimizeWindow.js';
 import {ShowNotificationListExtension} from './src/pinchGestures/showNotificationList.js';
 import {VolumeControlGestureExtension} from './src/volumeControl.js';
 import {BrightnessControlGestureExtension} from './src/brightnessControl.js';
@@ -276,6 +277,15 @@ export default class TouchpadGestureCustomization extends Extension {
                 new PinchKeyboardBacklightControlExtension(
                     pinchKeyboardControlFingers
                 )
+            );
+
+        // pinch to minimize the focused window
+        const minimizeWindowFingers = pinchToFingersMap.get(
+            PinchGestureType.MINIMIZE_WINDOW
+        );
+        if (minimizeWindowFingers?.length)
+            this._extensions.push(
+                new MinimizeWindowExtension(minimizeWindowFingers)
             );
 
         /**
