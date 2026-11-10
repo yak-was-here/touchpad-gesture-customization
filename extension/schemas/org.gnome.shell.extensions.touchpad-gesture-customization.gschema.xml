@@ -39,6 +39,7 @@
     <value value='5' nick='BRIGHTNESS_CONTROL' />
     <value value='6' nick='WINDOW_MANIPULATION' />
     <value value='7' nick='MEDIA_CONTROL' />
+    <value value='8' nick='SHOW_DESKTOP' />
   </enum>
   <enum id='org.gnome.shell.extensions.touchpad-gesture-customization.horizontal-swipe-gestures'>
     <value value='0' nick='NONE' />
@@ -48,6 +49,7 @@
     <value value='4' nick='VOLUME_CONTROL' />
     <value value='5' nick='BRIGHTNESS_CONTROL' />
     <value value='6' nick='MEDIA_CONTROL' />
+    <value value='7' nick='SHOW_DESKTOP' />
   </enum>
   <schema id="org.gnome.shell.extensions.touchpad-gesture-customization" path="/org/gnome/shell/extensions/touchpad-gesture-customization/">
     <!-- See also: https://docs.gtk.org/glib/gvariant-format-strings.html -->

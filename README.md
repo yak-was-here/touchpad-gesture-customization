@@ -53,6 +53,7 @@ gnome-extensions enable touchpad-gesture-customization@coooolapps.com
 | Volume Control           | Increase/decrease system volume              | 3/4/both | Vertical/Horizontal |
 | Brightness Control       | Increase/decrease system brightness          | 3/4/both | Vertical/Horizontal |
 | Media Control            | Play next/previous media, hold to play/pause | 3/4/both | Vertical/Horizontal |
+| Show Desktop             | Swipe down/right shows the desktop, up/left restores | 3/4/both | Vertical/Horizontal |
 
 | Pinch Gesture Actions      | Description                                     | Fingers |
 | :----------------------    | :---------------------------------------------- | :------ |
@@ -106,6 +107,13 @@ gnome-extensions enable touchpad-gesture-customization@coooolapps.com
 - Media Control sends the standard media keys (`XF86AudioNext` / `XF86AudioPrev` / `XF86AudioPlay`), so it applies to whichever player GNOME currently considers active, exactly as pressing the media keys on a keyboard would. It is not tied to any specific application.
 - How far you need to swipe before a track changes scales with the **Touchpad swipe speed** setting: raising it makes media swipes trigger with a shorter movement.
 - Resting your fingers doesn't toggle play/pause for a finger count that has a tap action, because every tap starts with a rest.
+
+#### Show Desktop (swipe) Notes
+
+- Swipe down to show the desktop, and swipe up to restore the windows that were minimized. On a horizontal swipe, swipe right to show the desktop and swipe left to restore. Down and right are the positive direction on each axis. The Natural scrolling setting does not change this, so down stays down.
+- The swipe has to travel a little past the point where it is recognised. How far that is scales with **Touchpad swipe speed**, the same way Media Control does.
+- It hides the same windows as **Toggle Desktop**: normal windows on the active workspace that can be minimized and are not skipped on the taskbar. Switching workspace, opening a window, or unminimizing a window by hand ends it, and disabling the extension restores the windows. A tap and a swipe share that state, so either one can restore what the other hid. Pinch **Show Desktop** is separate and is unchanged.
+- The swipe does not run while the overview is open, so overview navigation is left alone.
 
 #### Tap Gesture Notes
 
