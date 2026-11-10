@@ -111,6 +111,10 @@
       <default>false</default>
       <description>Enable vertical swipe for app gesture</description>
     </key>
+    <key name='mirror-gestures-to-touchscreen' type='b'>
+      <default>false</default>
+      <description>When true, a touchscreen gesture with the same finger count and direction runs the touchpad action configured for it. When false, GNOME's built-in touchscreen gestures are left unchanged.</description>
+    </key>
     <key name="pinch-3-finger-gesture" enum="org.gnome.shell.extensions.touchpad-gesture-customization.pinch-gestures">
       <default>'CLOSE_DOCUMENT'</default>
       <description>Gesture action for 3 finger pinch</description>

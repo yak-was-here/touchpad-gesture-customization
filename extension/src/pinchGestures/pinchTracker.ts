@@ -4,7 +4,12 @@ import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {CustomEventType} from 'resource:///org/gnome/shell/ui/swipeTracker.js';
-import {TouchpadConstants} from '../../constants.js';
+import {ExtSettings, TouchpadConstants} from '../../constants.js';
+import {
+    registerTouchscreenSink,
+    TouchscreenGestureKind,
+    TouchscreenGestureState,
+} from '../touchscreenGestures.js';
 
 const MIN_ANIMATION_DURATION = 100;
 const MAX_ANIMATION_DURATION = 400;
@@ -90,6 +95,7 @@ export const TouchpadPinchGesture = GObject.registerClass(
         private _snapPoints = [0, 1, 2];
         public enabled = true;
         private _initialProgress = 0;
+        private _unregisterTouchscreen?: () => void;
         PINCH_MULTIPLIER: number;
 
         constructor(params: {
@@ -110,6 +116,43 @@ export const TouchpadPinchGesture = GObject.registerClass(
             this._historyTracker = new EventHistoryTracker();
             this.PINCH_MULTIPLIER =
                 TouchpadConstants.PINCH_MULTIPLIER * (params.pinchSpeed ?? 1.0);
+
+            if (ExtSettings.MIRROR_TOUCHSCREEN)
+                this._unregisterTouchscreen = registerTouchscreenSink({
+                    canHandle: (fingerCount, kind) =>
+                        this._canHandleTouchscreen(fingerCount, kind),
+                    touchscreenState: () => this._touchscreenState(),
+                    handleEvent: event =>
+                        this._handleEvent(undefined, event as CustomEventType),
+                });
+        }
+
+        private _canHandleTouchscreen(
+            fingerCount: number,
+            kind: TouchscreenGestureKind
+        ): boolean {
+            if (kind !== 'pinch' || !this.enabled) return false;
+
+            if (!this._nfingers.includes(fingerCount)) return false;
+
+            if (
+                this._allowedModes !== Shell.ActionMode.ALL &&
+                (this._allowedModes & Main.actionMode) === 0
+            )
+                return false;
+
+            return true;
+        }
+
+        private _touchscreenState(): TouchscreenGestureState {
+            switch (this._state) {
+                case TouchpadState.HANDLING:
+                    return 'handling';
+                case TouchpadState.IGNORED:
+                    return 'ignored';
+                default:
+                    return 'idle';
+            }
         }
 
         _handleEvent(
@@ -348,6 +391,9 @@ export const TouchpadPinchGesture = GObject.registerClass(
         }
 
         destroy() {
+            this._unregisterTouchscreen?.();
+            this._unregisterTouchscreen = undefined;
+
             if (this._stageCaptureEvent) {
                 global.stage.disconnect(this._stageCaptureEvent);
                 this._stageCaptureEvent = 0;

@@ -7,7 +7,13 @@ import {
     CustomEventType,
     _SwipeTrackerOptionalParams,
 } from 'resource:///org/gnome/shell/ui/swipeTracker.js';
-import {TouchpadConstants} from '../constants.js';
+import {ExtSettings, TouchpadConstants} from '../constants.js';
+import {
+    detachBuiltinPanGesture,
+    registerTouchscreenSink,
+    TouchscreenGestureKind,
+    TouchscreenGestureState,
+} from './touchscreenGestures.js';
 
 enum TouchpadState {
     NONE = 0,
@@ -70,6 +76,7 @@ export const TouchpadSwipeGesture = GObject.registerClass(
         private _swipeGestureBeginTime = 0;
         private _holdGestureBeginTime = 0;
         private _holdGestureCancelTime = 0;
+        private _unregisterTouchscreen?: () => void;
 
         constructor(
             nfingers: number[],
@@ -94,6 +101,48 @@ export const TouchpadSwipeGesture = GObject.registerClass(
             this.SWIPE_MULTIPLIER =
                 TouchpadConstants.SWIPE_MULTIPLIER *
                 (typeof gestureSpeed !== 'number' ? 1.0 : gestureSpeed);
+
+            if (ExtSettings.MIRROR_TOUCHSCREEN)
+                this._unregisterTouchscreen = registerTouchscreenSink({
+                    canHandle: (fingerCount, kind, axis) =>
+                        this._canHandleTouchscreen(fingerCount, kind, axis),
+                    touchscreenState: () => this._touchscreenState(),
+                    handleEvent: event =>
+                        this._handleEvent(undefined, event as CustomEventType),
+                });
+        }
+
+        private _canHandleTouchscreen(
+            fingerCount: number,
+            kind: TouchscreenGestureKind,
+            orientation: Clutter.Orientation
+        ): boolean {
+            if (kind !== 'swipe' || !this.enabled) return false;
+
+            if (!this._nfingers.includes(fingerCount)) return false;
+
+            if (orientation !== this.orientation) return false;
+
+            if (
+                this._allowedModes !== Shell.ActionMode.ALL &&
+                (this._allowedModes & actionMode) === 0
+            )
+                return false;
+
+            return true;
+        }
+
+        private _touchscreenState(): TouchscreenGestureState {
+            switch (this._state) {
+                case TouchpadState.PENDING:
+                    return 'pending';
+                case TouchpadState.HANDLING:
+                    return 'handling';
+                case TouchpadState.IGNORED:
+                    return 'ignored';
+                default:
+                    return 'idle';
+            }
         }
 
         private _resetState() {
@@ -283,6 +332,9 @@ export const TouchpadSwipeGesture = GObject.registerClass(
         }
 
         destroy() {
+            this._unregisterTouchscreen?.();
+            this._unregisterTouchscreen = undefined;
+
             if (this._stageCaptureEvent) {
                 global.stage.disconnect(this._stageCaptureEvent);
                 this._stageCaptureEvent = null;
@@ -320,6 +372,10 @@ export function createSwipeTracker(
     //     global.stage.remove_action(swipeTracker._panGesture);
     //     delete swipeTracker._panGesture;
     // }
+
+    // While mirroring, this tracker's action is driven by synthesized
+    // touchpad events. The pan gesture GNOME attached would fire it too.
+    if (ExtSettings.MIRROR_TOUCHSCREEN) detachBuiltinPanGesture(swipeTracker);
 
     // remove old touchpad gesture from swipeTracker
     if (swipeTracker._touchpadGesture) {

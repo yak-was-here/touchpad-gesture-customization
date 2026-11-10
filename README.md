@@ -114,6 +114,14 @@ gnome-extensions enable touchpad-gesture-customization@coooolapps.com
 - Media actions send the standard media keys, the same way Media Control does.
 - Setting a tap action turns off Media Control's play/pause on finger rest for the same number of fingers.
 
+#### Touchscreen
+
+One switch, **Mirror gestures to the touchscreen**, runs the gestures configured above from a touchscreen as well. It is off by default. A 3- or 4-finger swipe, pinch, hold, or tap uses the same finger count and the same action as on the touchpad. There is no separate touchscreen configuration.
+
+One finger and two fingers are left alone, so tapping, scrolling, and dragging a window do not change. While the switch is on, a gesture this extension handles is not also handled by GNOME's built-in touchscreen gesture. GNOME's built-in gestures are 3-finger swipes (workspace switching and the overview). A direction you set to **None** still uses that built-in gesture. Turn the switch off to restore the previous touchscreen behavior.
+
+The same speed sliders apply, because the touchscreen gesture is fed into the touchpad handlers. Details, including which GNOME versions this covers and how conflicts are avoided, are in [docs/touchscreen-gestures](docs/touchscreen-gestures/gnome-version-support.md).
+
 #### Keyboard Backlight Notes
 - This will only work if you have a Keyboard Backlight tile in Gnome quick settings.
 

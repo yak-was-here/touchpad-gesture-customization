@@ -158,5 +158,25 @@
                 </child>
             </object>
         </child>
+
+        <!-- Touchscreen -->
+        <child>
+            <object class="AdwPreferencesGroup">
+                <property name="title" translatable="yes">Touchscreen</property>
+                <property name="description" translatable="yes">Also run the gestures on this page from the touchscreen. Same number of fingers, same direction, same action. Leave this off to keep GNOME's built-in touchscreen gestures.</property>
+
+                <child>
+                    <object class="AdwActionRow">
+                        <property name="title" translatable="yes">Mirror gestures to the touchscreen</property>
+                        <child>
+                            <object class="GtkSwitch" id="mirror-gestures-to-touchscreen">
+                                <property name="valign">center</property>
+                                <property name="active">False</property>
+                            </object>
+                        </child>
+                    </object>
+                </child>
+            </object>
+        </child>
     </object>
 </interface>
